@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 823bc1683aa8fef4da611efb34917d86, type: 3}
+  m_Name: MarioGame
+  m_EditorClassIdentifier: Assembly-CSharp::MarioEffect
+  duration: 10
+  marioModePrefab: {fileID: 1711430170355118100, guid: 249b395b73ac2be4e998772379959df8, type: 3}
+  wireframeMaterial: {fileID: 2100000, guid: 1b1d83b49ba347543a85b9b4d70a75fe, type: 2}
+  buildDuration: 2
