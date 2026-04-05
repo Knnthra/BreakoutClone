@@ -22,6 +22,7 @@ public class Chunk : MonoBehaviour
     /// </summary>
     [SerializeField] private Material defaultMaterial;
 
+
     /// <summary>
     /// True while still part of the brick grid
     /// </summary>

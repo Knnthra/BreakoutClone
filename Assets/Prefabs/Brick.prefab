@@ -120,6 +120,7 @@ MonoBehaviour:
   destruction: {fileID: -2664763682433338279}
   <Collider>k__BackingField: {fileID: 3372362295134431207}
   <meshRenderer>k__BackingField: {fileID: 5254104164859152734}
+  brickBreakAudioClip: {fileID: 8300000, guid: c0ed38e706d549c42ac4011678696103, type: 3}
 --- !u!114 &-2664763682433338279
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -138,7 +139,5 @@ MonoBehaviour:
   gravity: -9.8
   chunkLifetime: 2
   shrinkStartTime: 1.2
-  brickRenderer: {fileID: 5254104164859152734}
   brick: {fileID: 2211047259597784264}
-  brickCollider: {fileID: 3372362295134431207}
   chunkPrefab: {fileID: 852601301609773642, guid: 825e565c49088af419642f4963ca02d4, type: 3}

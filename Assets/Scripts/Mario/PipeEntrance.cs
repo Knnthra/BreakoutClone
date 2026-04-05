@@ -6,6 +6,7 @@ public class PipeEntrance : MonoBehaviour
 {
     [SerializeField] private float riseHeight = 2f;
     [SerializeField] private float riseSpeed = 3f;
+    [SerializeField] private AudioClip pipeAudioClip;
 
     public void Rise(Transform target, Action onComplete)
     {
@@ -27,6 +28,9 @@ public class PipeEntrance : MonoBehaviour
         }
         if (col != null)
             col.enabled = false;
+
+        if (pipeAudioClip != null)
+            AudioManager.Instance.PlaySFX(pipeAudioClip);
 
         Vector3 endPos = transform.position + Vector3.up * riseHeight;
 

@@ -6,6 +6,7 @@ public class QuestionBlock : MonoBehaviour
 {
     [SerializeField] private float popHeight = 0.5f;
     [SerializeField] private float popSpeed = 6f;
+    [SerializeField] private AudioClip hitAudioClip;
 
     [SerializeField] private Mesh blankBlockMesh;
 
@@ -79,6 +80,8 @@ public class QuestionBlock : MonoBehaviour
                 goingUp = true;
                 active = false;
                 meshFilter.mesh = blankBlockMesh;
+                if (hitAudioClip != null)
+                    AudioManager.Instance.PlaySFX(hitAudioClip);
                 if (MarioEffect.Active != null)
                     MarioEffect.Active.StartTimer();
                 StartCoroutine(SpawnSteps());

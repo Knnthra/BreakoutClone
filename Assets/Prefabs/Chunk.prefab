@@ -128,3 +128,4 @@ MonoBehaviour:
   collider: {fileID: 7984002339245269275}
   meshRenderer: {fileID: 6974548505275485228}
   defaultMaterial: {fileID: 2100000, guid: 24feaa383e6fffb45b51478e4a8d8920, type: 2}
+  chunkBreakAudioClip: {fileID: 8300000, guid: c0ed38e706d549c42ac4011678696103, type: 3}

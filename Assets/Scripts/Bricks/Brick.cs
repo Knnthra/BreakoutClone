@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Brick : MonoBehaviour, IDestructable
@@ -11,7 +12,13 @@ public class Brick : MonoBehaviour, IDestructable
     [field: SerializeField] public Collider Collider { get; private set; }
 
     [field: SerializeField] public MeshRenderer meshRenderer { get; private set; }
-    
+
+    [SerializeField] private AudioClip brickBreakAudioClip;
+
+    private void Start()
+    {
+        GameManager.Instance.RegisterBrick();
+    }
 
     /// <summary>
     /// Deals damage to the brick using collision data
@@ -19,10 +26,8 @@ public class Brick : MonoBehaviour, IDestructable
     /// <param name="collision">Describes the collision</param>
     public void Damage(Collision collision = null)
     {
-        Vector3 hitPoint = collision != null && collision.contactCount > 0
-            ? collision.contacts[0].point : transform.position;
-        Vector3 normal = collision != null && collision.contactCount > 0
-            ? collision.contacts[0].normal : Vector3.up;
+        Vector3 hitPoint = collision != null && collision.contactCount > 0 ? collision.contacts[0].point : transform.position;
+        Vector3 normal = collision != null && collision.contactCount > 0 ? collision.contacts[0].normal : Vector3.up;
         ApplyDamage(hitPoint, normal);
     }
 
@@ -42,6 +47,7 @@ public class Brick : MonoBehaviour, IDestructable
     private void ApplyDamage(Vector3 hitPoint, Vector3 normal)
     {
         Health--;
+        AudioManager.Instance.PlaySFX(brickBreakAudioClip);
 
         if (!TryDestroy() && destruction != null)
             destruction.BreakChunksAtPoint(hitPoint, normal);
@@ -64,6 +70,7 @@ public class Brick : MonoBehaviour, IDestructable
             // Delay destroy so chunks can animate
             Destroy(gameObject, 2.5f);
             GameManager.Instance.ScorePoint();
+            GameManager.Instance.RemoveBrick();
             return true;
         }
 

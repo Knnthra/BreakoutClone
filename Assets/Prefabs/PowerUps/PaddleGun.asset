@@ -16,3 +16,4 @@ MonoBehaviour:
   upgradePrefab: {fileID: -2420261931904806389, guid: de4e96a4f1d44244cb45f438f60a2772, type: 3}
   wireframeMaterial: {fileID: 2100000, guid: 1b1d83b49ba347543a85b9b4d70a75fe, type: 2}
   buildDuration: 1
+  laserSound: {fileID: 8300000, guid: 81422c4d6f470cc4789192e3eac4ec39, type: 3}

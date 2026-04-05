@@ -72,6 +72,7 @@ public class Mario : MonoBehaviour, IDamageSource
     /// Mario's jumpforce
     /// </summary>
     [SerializeField] private float jumpForce = 8f;
+    [SerializeField] private AudioClip jumpAudioClip;
 
     /// <summary>
     /// A referece to Mario's rigidbody
@@ -235,6 +236,8 @@ public class Mario : MonoBehaviour, IDamageSource
             rigidBody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             isGrounded = false;
             PlayAnimation("Jump");
+            if (jumpAudioClip != null)
+                AudioManager.Instance.PlaySFX(jumpAudioClip);
         }
     }
 

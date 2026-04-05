@@ -8,8 +8,12 @@ public class PaddleGunEffect : PowerUpEffect
     [SerializeField] private Material wireframeMaterial;
     [SerializeField] private float buildDuration = 1f;
 
+    [SerializeField] private AudioClip laserSound;
+
     private PaddleGunUpgrade spawnedUpgrade;
     private WireframeBuildUp wireframeBuildUp;
+
+    
 
     public override void Apply(PowerUpEffectHandler handler)
     {
@@ -52,5 +56,6 @@ public class PaddleGunEffect : PowerUpEffect
     public void Shoot()
     {
         spawnedUpgrade.Shoot();
+        AudioManager.Instance.PlaySFX(laserSound);
     }
 }

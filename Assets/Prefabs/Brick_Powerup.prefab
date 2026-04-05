@@ -120,6 +120,7 @@ MonoBehaviour:
   destruction: {fileID: -2664763682433338279}
   <Collider>k__BackingField: {fileID: 3372362295134431207}
   <meshRenderer>k__BackingField: {fileID: 5254104164859152734}
+  brickBreakAudioClip: {fileID: 8300000, guid: c0ed38e706d549c42ac4011678696103, type: 3}
   powerUpPrefab: {fileID: 7116885137663008412, guid: 71becb1d531a35b41bae4df5706910bb, type: 3}
 --- !u!114 &-2664763682433338279
 MonoBehaviour:

@@ -10,12 +10,16 @@ public class MarioEffect : PowerUpEffect
     private bool timerStarted;
     private Ball ball;
     private Renderer[] paddleRenderers;
-    private Collider paddleCollider;
+    private Collider[] paddleColliders;
+
+    [SerializeField]private AudioClip marioThemeAudioClip;
 
     public static MarioEffect Active { get; private set; }
 
     public override void Apply(PowerUpEffectHandler handler)
-    {
+    {   
+
+        AudioManager.Instance.PlayMusic(marioThemeAudioClip);
         effectHandler = handler;
 
         if (marioModePrefab == null) return;
@@ -28,9 +32,9 @@ public class MarioEffect : PowerUpEffect
         // Disable paddle components but keep GameObject active for the effect handler timer
         Paddle paddle = handler.Paddle;
         paddle.enabled = false;
-        paddleCollider = paddle.GetComponent<Collider>();
-        if (paddleCollider != null)
-            paddleCollider.enabled = false;
+        paddleColliders = paddle.GetComponentsInChildren<Collider>();
+        foreach (var c in paddleColliders)
+            c.enabled = false;
         paddleRenderers = paddle.GetComponentsInChildren<Renderer>();
         foreach (var r in paddleRenderers)
             r.enabled = false;
@@ -108,36 +112,38 @@ public class MarioEffect : PowerUpEffect
 
             GameObject instance = marioModeInstance;
             Paddle paddle = effectHandler?.Paddle;
-            Collider col = paddleCollider;
+            Collider[] cols = paddleColliders;
             Renderer[] rends = paddleRenderers;
             Ball b = ball;
 
             wireframe.StartBuildOut(() =>
             {
                 Destroy(instance);
-                RestorePaddleAndBall(paddle, col, rends, b);
+                RestorePaddleAndBall(paddle, cols, rends, b);
             });
         }
         else
         {
-            RestorePaddleAndBall(effectHandler?.Paddle, paddleCollider, paddleRenderers, ball);
+            RestorePaddleAndBall(effectHandler?.Paddle, paddleColliders, paddleRenderers, ball);
         }
 
         Active = null;
         marioModeInstance = null;
         ball = null;
         paddleRenderers = null;
-        paddleCollider = null;
+        paddleColliders = null;
         base.Remove();
+        AudioManager.Instance.PlayIngameMusic();
     }
 
-    private static void RestorePaddleAndBall(Paddle paddle, Collider col, Renderer[] rends, Ball b)
+    private static void RestorePaddleAndBall(Paddle paddle, Collider[] cols, Renderer[] rends, Ball b)
     {
         if (paddle != null)
         {
             paddle.enabled = true;
-            if (col != null)
-                col.enabled = true;
+            if (cols != null)
+                foreach (var c in cols)
+                    c.enabled = true;
             if (rends != null)
                 foreach (var r in rends)
                     r.enabled = true;

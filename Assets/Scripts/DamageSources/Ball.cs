@@ -34,6 +34,8 @@ public class Ball : MonoBehaviour, IDamageSource
     /// </summary>
     [SerializeField] private Rigidbody rigidBody;
 
+    [SerializeField] private AudioClip paddleHitAudioClip;
+
     /// <summary>
     /// Input action for launching the ball from the paddle
     /// </summary>
@@ -186,6 +188,8 @@ public class Ball : MonoBehaviour, IDamageSource
             ApplyBounceVelocity(normalized, angle);
 
             paddle.OnBallHit();
+
+            AudioManager.Instance.PlaySFX(paddleHitAudioClip);
         }
     }
 

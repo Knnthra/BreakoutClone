@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
     [SerializeField] private GameObject gameOverText;
+    [SerializeField] private GameObject youWinText;
     [SerializeField] private Volume globalVolume;
 
     [SerializeField] private Mesh[] numberMeshes;
@@ -21,6 +22,7 @@ public class GameManager : MonoBehaviour
     private float[] spinAngles;
     private Quaternion[] originalRotations;
     private bool isSpinning;
+    private int activeBrickCount;
 
 
     private void Awake()
@@ -41,13 +43,25 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         gameOverText.SetActive(false);
+        youWinText.SetActive(false);
         LifeManager.Instance.OnGameOver += GameOver;
+        AudioManager.Instance.PlayIngameMusic();
     }
 
     private void GameOver()
     {
         gameOverText.SetActive(true);
+        EndGame();
+    }
 
+    private void Win()
+    {
+        youWinText.SetActive(true);
+        EndGame();
+    }
+
+    private void EndGame()
+    {
         IsGameOver = true;
 
         if (globalVolume.profile.TryGet(out ColorAdjustments colorAdjustments))
@@ -85,6 +99,16 @@ public class GameManager : MonoBehaviour
 
         if (allDone)
             isSpinning = false;
+    }
+
+    public void RegisterBrick() => activeBrickCount++;
+
+    public void RemoveBrick()
+    {
+        activeBrickCount--;
+
+        if (activeBrickCount <= 0)
+            Win();
     }
 
     public void ScorePoint()

@@ -16,3 +16,4 @@ MonoBehaviour:
   marioModePrefab: {fileID: 1711430170355118100, guid: 249b395b73ac2be4e998772379959df8, type: 3}
   wireframeMaterial: {fileID: 2100000, guid: 1b1d83b49ba347543a85b9b4d70a75fe, type: 2}
   buildDuration: 2
+  marioThemeAudioClip: {fileID: 8300000, guid: 05a1e387af2ab1f4f919d48c34eb8269, type: 3}
