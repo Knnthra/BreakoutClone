@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -44,9 +45,19 @@ public class Ball : MonoBehaviour, IDamageSource
     private InputAction launchAction;
 
     /// <summary>
+    /// Fired the first time the ball is launched. Subscribers are cleared after invocation.
+    /// </summary>
+    public event Action OnFirstLaunch;
+
+    /// <summary>
     /// True once launched, false while sitting on the paddle.
     /// </summary>
     private bool isLaunched;
+
+    /// <summary>
+    /// Tracks whether the ball has been launched at least once this session.
+    /// </summary>
+    private bool hasLaunchedOnce;
 
     /// <summary>
     /// Positional offset from paddle to ball, used to keep the ball on the paddle before launch.
@@ -162,6 +173,13 @@ public class Ball : MonoBehaviour, IDamageSource
     {
         isLaunched = true;
         rigidBody.linearVelocity = launchDirection.normalized * Speed;
+
+        if (!hasLaunchedOnce)
+        {
+            hasLaunchedOnce = true;
+            OnFirstLaunch?.Invoke();
+            OnFirstLaunch = null;
+        }
     }
 
     private void OnCollisionEnter(Collision collision)

@@ -44,7 +44,12 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// A reference to the ball object
     /// </summary>
-    [SerializeField]private Ball ballObject;
+    [SerializeField] private Ball ballObject;
+
+    /// <summary>
+    /// UI element showing controls info, hidden after the first ball launch.
+    /// </summary>
+    [SerializeField] private GameObject controlsInfoText;
 
     [Header("Intro Camera")]
 
@@ -110,6 +115,11 @@ public class GameManager : MonoBehaviour
     {
         gameOverText.SetActive(false);
         youWinText.SetActive(false);
+        if (controlsInfoText != null)
+        {
+            controlsInfoText.SetActive(true);
+            ballObject.OnFirstLaunch += () => controlsInfoText.SetActive(false);
+        }
         LifeManager.Instance.OnGameOver += GameOver;
         AudioManager.Instance.PlayIngameMusic();
 
