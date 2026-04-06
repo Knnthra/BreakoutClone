@@ -4,56 +4,55 @@ using UnityEngine.InputSystem;
 public class Ball : MonoBehaviour, IDamageSource
 {
     /// <summary>
-    /// The speed of the ball
+    /// Movement speed of the ball in units per second.
     /// </summary>
     [field: SerializeField] public float Speed { get; set; }
 
     /// <summary>
-    /// The default launch direction the ball will launch in when attached to the paddle
+    /// Default upward direction the ball launches in from the paddle.
     /// </summary>
     private Vector3 launchDirection = new Vector3(0f, 1f, 0f);
 
     /// <summary>
-    /// A reference to the paddle
+    /// Reference to the paddle transform, used to follow it before launch.
     /// </summary>
     [SerializeField] private Transform paddle;
 
-
     /// <summary>
-    /// Minimum angle from horizontal in degrees, prevents the ball from bouncing too flat
+    /// Minimum bounce angle from horizontal in degrees, prevents too-flat bounces.
     /// </summary>
     [SerializeField][Range(10f, 60f)] private float minAngle;
 
     /// <summary>
-    /// Maximum angle from horizontal in degrees, prevents the ball from bouncing too steep
+    /// Maximum bounce angle from horizontal in degrees, prevents too-steep bounces.
     /// </summary>
     [SerializeField][Range(60f, 89f)] private float maxAngle;
 
     /// <summary>
-    /// The ball's rigidbody used for physics movement
+    /// The ball's rigidbody used for physics movement.
     /// </summary>
     [SerializeField] private Rigidbody rigidBody;
 
+    /// <summary>
+    /// Sound played when the ball hits the paddle.
+    /// </summary>
     [SerializeField] private AudioClip paddleHitAudioClip;
 
     /// <summary>
-    /// Input action for launching the ball from the paddle
+    /// Input action for launching the ball from the paddle.
     /// </summary>
     private InputAction launchAction;
 
     /// <summary>
-    /// True once the ball has been launched, false while sitting on the paddle
+    /// True once launched, false while sitting on the paddle.
     /// </summary>
     private bool isLaunched;
 
     /// <summary>
-    /// Offset from paddle to ball at start, used to keep the ball positioned on the paddle before launch
+    /// Positional offset from paddle to ball, used to keep the ball on the paddle before launch.
     /// </summary>
     private Vector3 paddleOffset;
 
-    /// <summary>
-    /// Creates and enables the launch input action
-    /// </summary>
     private void OnEnable()
     {
         launchAction = new InputAction("Launch", InputActionType.Button);
@@ -61,27 +60,17 @@ public class Ball : MonoBehaviour, IDamageSource
         launchAction.Enable();
     }
 
-    /// <summary>
-    /// Disables and disposes the launch input action
-    /// </summary>
     private void OnDisable()
     {
         launchAction.Disable();
         launchAction.Dispose();
     }
 
-    /// <summary>
-    /// Stores the initial offset from paddle to ball and sets the ball as not launched
-    /// </summary>
     private void Start()
     {
-        paddleOffset = transform.position - paddle.position;
-        isLaunched = false;
+        Initializ();
     }
 
-    /// <summary>
-    /// Before launch, keeps the ball on the paddle and listens for the launch input
-    /// </summary>
     private void Update()
     {
         if (!isLaunched)
@@ -95,9 +84,6 @@ public class Ball : MonoBehaviour, IDamageSource
         }
     }
 
-    /// <summary>
-    /// Clamps the ball's angle to prevent too-flat or too-steep bounces, and enforces constant speed
-    /// </summary>
     private void FixedUpdate()
     {
         if (!isLaunched) return;
@@ -106,7 +92,16 @@ public class Ball : MonoBehaviour, IDamageSource
     }
 
     /// <summary>
-    /// Calculates the linear velocity of the ball
+    /// Initializes the ball position based on the paddle offset
+    /// </summary>
+    private void Initializ()
+    {
+        paddleOffset = transform.position - paddle.position;
+        isLaunched = false;
+    }
+
+    /// <summary>
+    /// Clamps the ball's velocity angle and enforces constant speed.
     /// </summary>
     private void CalculateLinearVelocity()
     {
@@ -129,10 +124,10 @@ public class Ball : MonoBehaviour, IDamageSource
     }
 
     /// <summary>
-    /// Sets a the velocity to the min required angle
+    /// Redirects velocity to the minimum allowed angle, preventing too-flat travel.
     /// </summary>
-    /// <param name="velocity"></param>
-    /// <returns></returns>
+    /// <param name="velocity">Current travel direction; its sign is preserved while the angle is overridden.</param>
+    /// <returns>New velocity aimed at exactly the minimum allowed angle.</returns>
     private Vector3 SetVelocityToMinAngle(Vector3 velocity)
     {
         float dirY = velocity.y >= 0f ? 1f : -1f;
@@ -145,10 +140,10 @@ public class Ball : MonoBehaviour, IDamageSource
     }
 
     /// <summary>
-    /// Sets a the velocity to the max allowed angle
+    /// Redirects velocity to the maximum allowed angle, preventing too-steep travel.
     /// </summary>
-    /// <param name="velocity"></param>
-    /// <returns></returns>
+    /// <param name="velocity">Current travel direction; its sign is preserved while the angle is overridden.</param>
+    /// <returns>New velocity aimed at exactly the maximum allowed angle.</returns>
     private Vector3 SetVelocityToMaxAngle(Vector3 velocity)
     {
         float dirX = velocity.x >= 0f ? 1f : -1f;
@@ -161,7 +156,7 @@ public class Ball : MonoBehaviour, IDamageSource
     }
 
     /// <summary>
-    /// Launches the ball upward from the paddle at the configured speed
+    /// Launches the ball upward from the paddle at the configured speed.
     /// </summary>
     private void Launch()
     {
@@ -169,9 +164,6 @@ public class Ball : MonoBehaviour, IDamageSource
         rigidBody.linearVelocity = launchDirection.normalized * Speed;
     }
 
-    /// <summary>
-    /// Overrides bounce direction when hitting the paddle based on where the ball lands
-    /// </summary>
     private void OnCollisionEnter(Collision collision)
     {
         if (!collision.gameObject.CompareTag("Paddle"))
@@ -194,12 +186,12 @@ public class Ball : MonoBehaviour, IDamageSource
     }
 
     /// <summary>
-    /// Gets the normalized impact position  from -1 to 1 (left edge to right edge)
+    /// Returns the normalized impact position from -1 (left edge) to 1 (right edge) on the paddle.
     /// </summary>
-    /// <param name="paddle"></param>
-    /// <returns></returns>
+    /// <param name="paddle">Provides the collider bounds used to normalize the hit offset.</param>
+    /// <returns>-1 at the left edge, 0 at center, 1 at the right edge.</returns>
     private float GetImpactPosition(Paddle paddle)
-    {   
+    {
         float paddleHalfWidth = paddle.Collider.bounds.extents.x;
         float hitOffset = transform.position.x - paddle.transform.position.x;
 
@@ -208,16 +200,22 @@ public class Ball : MonoBehaviour, IDamageSource
     }
 
     /// <summary>
-    /// Calculates the bounce angle in radians based on impact position
+    /// Converts normalized paddle impact position to a bounce angle in radians.
     /// </summary>
-    /// <returns></returns>
+    /// <param name="normalized">Paddle hit position: 0 = center (90 degrees), +/-1 = edge (minAngle).</param>
+    /// <returns>Bounce angle in radians, steeper at center and shallower at edges.</returns>
     private float CalculateBounceAngleInRadians(float normalized)
     {
         float angle = Mathf.Lerp(90f, minAngle, Mathf.Abs(normalized));
         return angle * Mathf.Deg2Rad;
     }
 
-    private void ApplyBounceVelocity (float normalized, float angle)
+    /// <summary>
+    /// Sets the ball's velocity based on the bounce angle and paddle hit direction.
+    /// </summary>
+    /// <param name="normalized">Sign determines horizontal direction: negative = left, positive = right.</param>
+    /// <param name="angle">Bounce angle in radians, applied with cos/sin to build the velocity vector.</param>
+    private void ApplyBounceVelocity(float normalized, float angle)
     {
         // Build velocity: negative normalized = leftward, positive = rightward
         float dirX = normalized >= 0f ? 1f : -1f;
@@ -225,7 +223,7 @@ public class Ball : MonoBehaviour, IDamageSource
     }
 
     /// <summary>
-    /// Resets the ball back onto the paddle, ready to be launched again
+    /// Resets the ball back onto the paddle, ready to be launched again.
     /// </summary>
     public void ResetBall()
     {
@@ -235,8 +233,10 @@ public class Ball : MonoBehaviour, IDamageSource
     }
 
     /// <summary>
-    /// Always returns true since the ball damages anything it hits
+    /// Always returns true -- the ball damages anything it collides with.
     /// </summary>
+    /// <param name="collision">Unused; the ball damages everything regardless of contact details.</param>
+    /// <returns>Always true since the ball has no conditional damage logic.</returns>
     public bool CanDamage(Collision collision)
     {
         return true;

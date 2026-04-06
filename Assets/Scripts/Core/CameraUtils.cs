@@ -1,8 +1,12 @@
 using UnityEngine;
 
-// Shared camera utility methods. Works with both perspective and orthographic cameras.
 public static class CameraUtils
 {
+    /// <summary>
+    /// Returns half the visible width at the given world Z depth.
+    /// </summary>
+    /// <param name="worldZ">Depth in world space at which to measure the visible width.</param>
+    /// <returns>Half the camera's visible width in world units at that depth.</returns>
     public static float HalfWidth(float worldZ)
     {
         Camera cam = Camera.main;
@@ -15,6 +19,11 @@ public static class CameraUtils
         return halfHeight * cam.aspect;
     }
 
+    /// <summary>
+    /// Returns half the visible height at the given world Z depth.
+    /// </summary>
+    /// <param name="worldZ">Depth in world space at which to measure the visible height.</param>
+    /// <returns>Half the camera's visible height in world units at that depth.</returns>
     public static float HalfHeight(float worldZ)
     {
          Camera cam = Camera.main;
@@ -26,8 +35,12 @@ public static class CameraUtils
     }
 
     /// <summary>
-    /// Calculates horizontal movement bounds so an object of a given half-width stays on screen
+    /// Calculates horizontal min/max bounds so an object of a given half-width stays on screen.
     /// </summary>
+    /// <param name="worldZ">Depth in world space at which to calculate bounds.</param>
+    /// <param name="objectHalfWidth">Half the object's width, inset so it doesn't clip the screen edge.</param>
+    /// <param name="padding">Extra inset from the screen edge; negative values allow overlap.</param>
+    /// <returns>A tuple of (minX, maxX) the object can move between while staying on screen.</returns>
     public static (float minX, float maxX) HorizontalBounds(float worldZ, float objectHalfWidth, float padding = 0f)
     {
         Camera cam = Camera.main;

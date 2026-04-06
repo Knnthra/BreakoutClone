@@ -3,90 +3,112 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "PowerUps/Mario")]
 public class MarioEffect : PowerUpEffect
 {
+    /// <summary>
+    /// Prefab containing the full Mario mode setup (pipe, platforms, Mario character).
+    /// </summary>
     [SerializeField] private GameObject marioModePrefab;
+
+    /// <summary>
+    /// Material used for wireframe build-in/out animations.
+    /// </summary>
     [SerializeField] private Material wireframeMaterial;
+
+    /// <summary>
+    /// Duration of the wireframe build animation in seconds.
+    /// </summary>
     [SerializeField] private float buildDuration = 1f;
-    private GameObject marioModeInstance;
+
+    /// <summary>
+    /// Spawned instance of the Mario mode prefab.
+    /// </summary>
+    private MarioMode marioModeInstance;
+
+    /// <summary>
+    /// True once the effect duration timer has started counting down.
+    /// </summary>
     private bool timerStarted;
-    private Ball ball;
-    private Renderer[] paddleRenderers;
-    private Collider[] paddleColliders;
 
-    [SerializeField]private AudioClip marioThemeAudioClip;
+    /// <summary>
+    /// Music clip played during Mario mode.
+    /// </summary>
+    [SerializeField] private AudioClip marioThemeAudioClip;
 
+    /// <summary>
+    /// The currently active MarioEffect instance, or null if not active.
+    /// </summary>
     public static MarioEffect Active { get; private set; }
 
+    /// <summary>
+    /// Hides the paddle and ball, spawns Mario mode with wireframe build-in and pipe animation.
+    /// </summary>
+    /// <param name="handler">Provides paddle/ball access; its components are disabled during Mario mode.</param>
     public override void Apply(PowerUpEffectHandler handler)
-    {   
-
+    {
         AudioManager.Instance.PlayMusic(marioThemeAudioClip);
         effectHandler = handler;
 
         if (marioModePrefab == null) return;
 
         // Find and deactivate the ball
-        ball = Object.FindFirstObjectByType<Ball>();
-        if (ball != null)
-            ball.gameObject.SetActive(false);
+        GameManager.Instance.DisableBall();
 
-        // Disable paddle components but keep GameObject active for the effect handler timer
-        Paddle paddle = handler.Paddle;
-        paddle.enabled = false;
-        paddleColliders = paddle.GetComponentsInChildren<Collider>();
-        foreach (var c in paddleColliders)
-            c.enabled = false;
-        paddleRenderers = paddle.GetComponentsInChildren<Renderer>();
-        foreach (var r in paddleRenderers)
-            r.enabled = false;
+        // Deactivate the paddle entirely
+        handler.Paddle.gameObject.SetActive(false);
 
         // Instantiate Mario mode with wireframe build-in
         timerStarted = false;
         Active = this;
-        marioModeInstance = Instantiate(marioModePrefab);
 
-            // Disable Mario until wireframe + pipe animation finish
-        var mario = marioModeInstance.GetComponentInChildren<Mario>();
-        if (mario != null)
-        {
-            mario.enabled = false;
-            mario.gameObject.SetActive(false);
-        }
+        marioModeInstance = Instantiate(marioModePrefab).GetComponent<MarioMode>();
 
-        var wireframe = marioModeInstance.AddComponent<WireframeBuildUp>();
-        wireframe.Configure(wireframeMaterial, buildDuration);
-        wireframe.StartBuildIn(() =>
+        // Disable Mario until wireframe + pipe animation finish
+        marioModeInstance.DisableMario();
+
+        marioModeInstance.WireFrameBuildUp.Configure(wireframeMaterial, buildDuration);
+
+        marioModeInstance.WireFrameBuildUp.StartBuildIn(() =>
         {
-            var pipe = marioModeInstance.GetComponentInChildren<PipeEntrance>();
-            if (pipe != null && mario != null)
+            if (marioModeInstance.Mario == null) return;
+
+
+            if (marioModeInstance.PipeEntrance != null)
             {
-                mario.gameObject.SetActive(true);
-                pipe.Rise(mario.transform, () => mario.enabled = true);
+                marioModeInstance.ShowMario();
+                marioModeInstance.PipeEntrance.Rise(marioModeInstance.Mario.transform, () => marioModeInstance.EnableMario());
             }
-            else if (mario != null)
-            {
-                mario.gameObject.SetActive(true);
-                mario.enabled = true;
+            else
+            {   
+                marioModeInstance.ShowMario();
+                marioModeInstance.EnableMario();
             }
         });
     }
 
+    /// <summary>
+    /// Begins counting down the effect duration. Called after Mario is fully set up.
+    /// </summary>
     public void StartTimer() => timerStarted = true;
 
+    /// <summary>
+    /// Only ticks the base timer after StartTimer has been called.
+    /// </summary>
     public override void Execute()
     {
         if (timerStarted)
             base.Execute();
     }
 
+    /// <summary>
+    /// Disables Mario, builds out all spawned objects, and restores the paddle and ball.
+    /// </summary>
     public override void Remove()
     {
         if (marioModeInstance != null)
         {
             // Build-out the spawned steps
-            var questionBlock = marioModeInstance.GetComponentInChildren<QuestionBlock>();
-            if (questionBlock != null)
+            if (marioModeInstance.QuestionBlock != null)
             {
-                foreach (var step in questionBlock.SpawnedSteps)
+                foreach (var step in marioModeInstance.QuestionBlock.SpawnedSteps)
                 {
                     if (step == null) continue;
                     var stepWireframe = step.AddComponent<WireframeBuildUp>();
@@ -94,65 +116,45 @@ public class MarioEffect : PowerUpEffect
                     GameObject s = step;
                     stepWireframe.StartBuildOut(() => Destroy(s));
                 }
-                questionBlock.SpawnedSteps.Clear();
+                marioModeInstance.QuestionBlock.SpawnedSteps.Clear();
             }
 
             // Disable Mario input immediately
-            var mario = marioModeInstance.GetComponentInChildren<Mario>();
-            if (mario != null)
-                mario.enabled = false;
+            marioModeInstance.DisableMario();
 
-            // Fresh wireframe for build-out so it captures Mario's renderers
-            var oldWireframe = marioModeInstance.GetComponent<WireframeBuildUp>();
-            if (oldWireframe != null)
-                Destroy(oldWireframe);
+            // Reset wireframe so it re-scans renderers (now including Mario)
+            marioModeInstance.WireFrameBuildUp.Reset();
 
-            var wireframe = marioModeInstance.AddComponent<WireframeBuildUp>();
-            wireframe.Configure(wireframeMaterial, buildDuration);
+            marioModeInstance.WireFrameBuildUp.Configure(wireframeMaterial, buildDuration);
+            
+            GameObject instance = marioModeInstance.gameObject;
 
-            GameObject instance = marioModeInstance;
-            Paddle paddle = effectHandler?.Paddle;
-            Collider[] cols = paddleColliders;
-            Renderer[] rends = paddleRenderers;
-            Ball b = ball;
-
-            wireframe.StartBuildOut(() =>
+            marioModeInstance.WireFrameBuildUp.StartBuildOut(() =>
             {
                 Destroy(instance);
-                RestorePaddleAndBall(paddle, cols, rends, b);
+                RestorePaddleAndBall(effectHandler?.Paddle);
             });
         }
         else
         {
-            RestorePaddleAndBall(effectHandler?.Paddle, paddleColliders, paddleRenderers, ball);
+            RestorePaddleAndBall(effectHandler?.Paddle);
         }
 
         Active = null;
         marioModeInstance = null;
-        ball = null;
-        paddleRenderers = null;
-        paddleColliders = null;
         base.Remove();
         AudioManager.Instance.PlayIngameMusic();
     }
 
-    private static void RestorePaddleAndBall(Paddle paddle, Collider[] cols, Renderer[] rends, Ball b)
+    /// <summary>
+    /// Re-enables the paddle and resets the ball.
+    /// </summary>
+    /// <param name="paddle">Reactivated so the player can resume playing.</param>
+    private static void RestorePaddleAndBall(Paddle paddle)
     {
         if (paddle != null)
-        {
-            paddle.enabled = true;
-            if (cols != null)
-                foreach (var c in cols)
-                    c.enabled = true;
-            if (rends != null)
-                foreach (var r in rends)
-                    r.enabled = true;
-        }
+            paddle.gameObject.SetActive(true);
 
-        if (b != null)
-        {
-            b.gameObject.SetActive(true);
-            b.ResetBall();
-        }
+        GameManager.Instance.EnableAndResetBall();
     }
 }

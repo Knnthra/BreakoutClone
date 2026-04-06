@@ -5,70 +5,70 @@ using UnityEngine;
 public class WireframeBuildUp : MonoBehaviour
 {
     /// <summary>
-    /// Cached shader property ID for _BuildUpProgress, controls how much of the mesh is visible (0 = invisible, 1 = fully visible)
+    /// Cached shader property ID for _BuildUpProgress (0 = invisible, 1 = fully visible).
     /// </summary>
     private static readonly int BuildUpProgressID = Shader.PropertyToID("_BuildUpProgress");
 
     /// <summary>
-    /// Cached shader property ID for _WorldMinY, the lowest Y position of the combined bounds
+    /// Cached shader property ID for _WorldMinY, the lowest Y of the combined bounds.
     /// </summary>
     private static readonly int WorldMinYID = Shader.PropertyToID("_WorldMinY");
 
     /// <summary>
-    /// Cached shader property ID for _WorldMaxY, the highest Y position of the combined bounds
+    /// Cached shader property ID for _WorldMaxY, the highest Y of the combined bounds.
     /// </summary>
     private static readonly int WorldMaxYID = Shader.PropertyToID("_WorldMaxY");
 
     /// <summary>
-    /// The wireframe material used as a template for all renderer slots during the animation
+    /// Template wireframe material instanced for each renderer slot during animation.
     /// </summary>
     private Material wireframeMaterial;
 
     /// <summary>
-    /// How long the build-in or build-out animation takes in seconds
+    /// Duration of the build-in or build-out animation in seconds.
     /// </summary>
     private float buildDuration = 1f;
 
     /// <summary>
-    /// All renderers found in this object and its children
+    /// All renderers found in this object and its children.
     /// </summary>
     private Renderer[] renderers;
 
     /// <summary>
     /// Backup of each renderer's original materials, restored after build-in completes.
-    /// First index = renderer, second index = material slot.
     /// </summary>
     private Material[][] originalMaterials;
 
     /// <summary>
     /// Instanced wireframe materials applied during the animation.
-    /// First index = renderer, second index = material slot.
     /// </summary>
     private Material[][] wireframeMaterials;
 
     /// <summary>
-    /// Current animation progress from 0 (invisible) to 1 (fully visible)
+    /// Current animation progress from 0 (invisible) to 1 (fully visible).
     /// </summary>
     private float progress;
 
     /// <summary>
-    /// True while the build animation is actively running
+    /// True while the build animation is actively running.
     /// </summary>
     private bool isAnimating;
 
     /// <summary>
-    /// True for build-out (1 to 0), false for build-in (0 to 1)
+    /// True for build-out (1 to 0), false for build-in (0 to 1).
     /// </summary>
     private bool isReversing;
 
     /// <summary>
-    /// Optional callback invoked when the animation finishes
+    /// Optional callback invoked when the animation finishes.
     /// </summary>
     private Action onComplete;
 
     /// <summary>
-    /// Sets the wireframe material template and animation duration
+    /// Sets the wireframe material template and animation duration.
     /// </summary>
+    /// <param name="material">Cloned per renderer slot; the original asset stays unmodified.</param>
+    /// <param name="duration">How many seconds the build-in or build-out sweep takes.</param>
     public void Configure(Material material, float duration)
     {
         wireframeMaterial = material;
@@ -76,8 +76,20 @@ public class WireframeBuildUp : MonoBehaviour
     }
 
     /// <summary>
-    /// Starts the build-in animation: wireframe appears from bottom to top, then restores original materials
+    /// Clears cached renderers and materials so the next animation re-scans all children.
     /// </summary>
+    public void Reset()
+    {
+        DestroyWireframeMaterials();
+        renderers = null;
+        originalMaterials = null;
+        isAnimating = false;
+    }
+
+    /// <summary>
+    /// Starts the build-in animation: wireframe appears bottom to top, then restores original materials.
+    /// </summary>
+    /// <param name="onComplete">Fired after progress reaches 1 and original materials are restored.</param>
     public void StartBuildIn(Action onComplete = null)
     {
         this.onComplete = onComplete;
@@ -89,8 +101,9 @@ public class WireframeBuildUp : MonoBehaviour
     }
 
     /// <summary>
-    /// Starts the build-out animation: wireframe dissolves from top to bottom, then destroys wireframe materials
+    /// Starts the build-out animation: wireframe dissolves top to bottom, then destroys materials.
     /// </summary>
+    /// <param name="onComplete">Fired after progress reaches 0 and wireframe materials are destroyed.</param>
     public void StartBuildOut(Action onComplete = null)
     {
         this.onComplete = onComplete;
@@ -104,10 +117,15 @@ public class WireframeBuildUp : MonoBehaviour
         isAnimating = true;
     }
 
-    /// <summary>
-    /// Advances the animation progress each frame and triggers completion when done
-    /// </summary>
     private void Update()
+    {
+        Animate();
+    }
+
+    /// <summary>
+    /// Animates the build up or brakdown wireframe effect
+    /// </summary>
+    private void Animate()
     {
         if (!isAnimating)
             return;
@@ -141,7 +159,7 @@ public class WireframeBuildUp : MonoBehaviour
     }
 
     /// <summary>
-    /// Finds all child renderers and stores a copy of their current materials for later restoration
+    /// Caches all child renderers and stores copies of their current materials for restoration.
     /// </summary>
     private void CacheOriginalMaterials()
     {
@@ -153,8 +171,7 @@ public class WireframeBuildUp : MonoBehaviour
     }
 
     /// <summary>
-    /// Replaces every material slot on every renderer with an instanced wireframe material,
-    /// configured with the combined bounds so the shader knows the object's vertical extent
+    /// Replaces every material slot with an instanced wireframe material configured with combined bounds.
     /// </summary>
     private void ApplyWireframeMaterials()
     {
@@ -179,7 +196,7 @@ public class WireframeBuildUp : MonoBehaviour
     }
 
     /// <summary>
-    /// Puts the original materials back on all renderers and cleans up wireframe material instances
+    /// Restores the original materials on all renderers and cleans up wireframe instances.
     /// </summary>
     private void RestoreOriginalMaterials()
     {
@@ -190,8 +207,9 @@ public class WireframeBuildUp : MonoBehaviour
     }
 
     /// <summary>
-    /// Updates the _BuildUpProgress property on all wireframe material instances
+    /// Updates the _BuildUpProgress shader property on all wireframe material instances.
     /// </summary>
+    /// <param name="t">0 = fully invisible, 1 = fully visible; written to every wireframe instance.</param>
     private void SetWireframeProgress(float t)
     {
         for (int i = 0; i < wireframeMaterials.Length; i++)
@@ -205,9 +223,9 @@ public class WireframeBuildUp : MonoBehaviour
     }
 
     /// <summary>
-    /// Calculates a bounding box that encapsulates all child renderers,
-    /// used to set _WorldMinY and _WorldMaxY so the shader knows where bottom and top are
+    /// Calculates a bounding box encapsulating all child renderers for shader Y bounds.
     /// </summary>
+    /// <returns>Enclosing bounds whose min/max Y are written to the shader for the sweep range.</returns>
     private Bounds CalculateCombinedBounds()
     {
         Bounds bounds = renderers[0].bounds;
@@ -219,7 +237,7 @@ public class WireframeBuildUp : MonoBehaviour
     }
 
     /// <summary>
-    /// Destroys all instanced wireframe materials to prevent memory leaks
+    /// Destroys all instanced wireframe materials to prevent memory leaks.
     /// </summary>
     private void DestroyWireframeMaterials()
     {
@@ -238,9 +256,6 @@ public class WireframeBuildUp : MonoBehaviour
         wireframeMaterials = null;
     }
 
-    /// <summary>
-    /// Cleans up any wireframe material instances when this component is destroyed
-    /// </summary>
     private void OnDestroy()
     {
         DestroyWireframeMaterials();

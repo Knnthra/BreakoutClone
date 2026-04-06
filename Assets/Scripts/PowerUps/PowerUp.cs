@@ -2,10 +2,24 @@ using UnityEngine;
 
 public class PowerUp : MonoBehaviour
 {
+    /// <summary>
+    /// Y-axis rotation speed in degrees per second.
+    /// </summary>
     [SerializeField] private float rotaitonSpeed;
+
+    /// <summary>
+    /// Downward fall speed in units per second.
+    /// </summary>
     [SerializeField] private float fallSpeed;
+
+    /// <summary>
+    /// Array of possible effects this power-up can apply. Cycled through sequentially.
+    /// </summary>
     [SerializeField] private PowerUpEffect[] powerUpEffects;
 
+    /// <summary>
+    /// Static index cycling through powerUpEffects so each pickup gives a different effect.
+    /// </summary>
     private static int powerUpIndex;
 
     private void Update()
@@ -18,9 +32,18 @@ public class PowerUp : MonoBehaviour
     {
         if (GameManager.Instance.IsGameOver) return;
 
-        if (other.TryGetComponent(out PowerUpEffectHandler handler))
+        ApplyPowerUp(other.GetComponent<Paddle>());
+    }
+
+    /// <summary>
+    /// Applies a powerup to a target
+    /// </summary>
+    /// <param name="target"></param>
+    private void ApplyPowerUp(Paddle target)
+    {
+        if (target != null)
         {
-            handler.Apply(powerUpEffects[powerUpIndex]);
+            PowerUpEffectHandler.Instance.Apply(powerUpEffects[powerUpIndex]);
             powerUpIndex = (powerUpIndex + 1) % powerUpEffects.Length;
             Destroy(gameObject);
         }

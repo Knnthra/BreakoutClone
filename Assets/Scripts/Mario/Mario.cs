@@ -9,83 +9,90 @@ public class Mario : MonoBehaviour, IDamageSource
 {
 
     /// <summary>
-    /// A reference to Mario's meshfilter
+    /// MeshFilter used to swap meshes for frame-by-frame animation.
     /// </summary>
     [SerializeField] private MeshFilter meshFilter;
 
     /// <summary>
-    /// Array that contains all Mario's mesh animations
+    /// Array of all mesh-based animations (Idle, Walk, Jump).
     /// </summary>
     [SerializeField] private MeshAnimation[] animations;
 
     /// <summary>
-    /// A dictionary of all animations
+    /// Dictionary lookup for animations by name.
     /// </summary>
     private Dictionary<string, MeshAnimation> dictAnimations = new Dictionary<string, MeshAnimation>();
 
     /// <summary>
-    /// The animation we are currently playing
+    /// The animation currently being played.
     /// </summary>
     private MeshAnimation currentAnimation;
 
     /// <summary>
-    /// The current animation index
+    /// Current frame index in the active animation.
     /// </summary>
     public int CurrentIndex { get; private set; }
 
     /// <summary>
-    /// time emaplsed since last animation frame change
+    /// Time elapsed since the last animation frame change.
     /// </summary>
     private float timeElapsed;
 
     /// <summary>
-    /// Move action for mario
+    /// Input action for horizontal movement.
     /// </summary>
     private InputAction moveAction;
 
     /// <summary>
-    /// Jump action for mario
+    /// Input action for jumping.
     /// </summary>
     private InputAction jumpAction;
 
     /// <summary>
-    /// Mario's move input
+    /// Current horizontal input value (-1 to 1).
     /// </summary>
     private float moveInput;
 
     /// <summary>
-    /// Min X and max X positon for preventing Mario, from running off map
+    /// Left horizontal movement bound.
+    /// </summary>
+    /// <summary>
+    /// Right horizontal movement bound.
     /// </summary>
     private float minX, maxX;
 
     /// <summary>
-    /// How close Mario can walk to the dge
+    /// How close Mario can walk to the screen edge.
     /// </summary>
     [SerializeField] private float paddingFromEdge = 0;
 
     /// <summary>
-    /// Mario's movement speed
+    /// Horizontal movement speed in units per second.
     /// </summary>
     [SerializeField] private float speed;
 
     /// <summary>
-    /// Mario's jumpforce
+    /// Upward impulse force applied when jumping.
     /// </summary>
     [SerializeField] private float jumpForce = 8f;
+
+    /// <summary>
+    /// Sound played when Mario jumps.
+    /// </summary>
     [SerializeField] private AudioClip jumpAudioClip;
 
     /// <summary>
-    /// A referece to Mario's rigidbody
+    /// Mario's rigidbody for physics-based movement and jumping.
     /// </summary>
     [SerializeField] private Rigidbody rigidBody;
 
     /// <summary>
-    /// What is ground
+    /// Layer mask defining which layers count as ground for jump detection.
     /// </summary>
     [SerializeField] private LayerMask groundLayers;
 
     /// <summary>
-    /// True if Mario is on the ground
+    /// True when Mario is standing on a ground-layer surface.
     /// </summary>
     private bool isGrounded;
 
@@ -105,7 +112,6 @@ public class Mario : MonoBehaviour, IDamageSource
         dictAnimations = animations.ToDictionary(a => a.Name);
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     private void Start()
     {
         PlayAnimation("Idle");
@@ -114,7 +120,6 @@ public class Mario : MonoBehaviour, IDamageSource
 
     }
 
-    // Update is called once per frame
     private void Update()
     {
         HandleInput();
@@ -135,9 +140,9 @@ public class Mario : MonoBehaviour, IDamageSource
     }
 
     /// <summary>
-    /// Checks if Mario is standing on the ground
+    /// Checks collision contacts to determine if Mario landed on a ground-layer surface.
     /// </summary>
-    /// <param name="collision"></param>
+    /// <param name="collision">Checked for upward-facing normals on a ground-layer object.</param>
     private void GroundCheck(Collision collision)
     {
         if (((1 << collision.gameObject.layer) & groundLayers) != 0)
@@ -154,9 +159,9 @@ public class Mario : MonoBehaviour, IDamageSource
     }
 
     /// <summary>
-    /// Makes mario fall to the ground when he hits a block from below
+    /// Zeroes vertical velocity when Mario hits something from below (head bump).
     /// </summary>
-    /// <param name="collision"></param>
+    /// <param name="collision">Checked for downward-facing normals indicating Mario hit from below.</param>
     private void BounceDown(Collision collision)
     {
                 // Bounce down when hitting something from below (head bump)
@@ -174,7 +179,7 @@ public class Mario : MonoBehaviour, IDamageSource
     }
 
     /// <summary>
-    /// Makes Mario move
+    /// Moves Mario horizontally using the rigidbody, clamped to screen bounds.
     /// </summary>
     private void ApplyMovement()
     {
@@ -185,7 +190,7 @@ public class Mario : MonoBehaviour, IDamageSource
     }
 
     /// <summary>
-    /// Creates all input actions for the player
+    /// Creates and enables the move and jump input actions.
     /// </summary>
     private void CreateInputActions()
     {
@@ -199,7 +204,7 @@ public class Mario : MonoBehaviour, IDamageSource
     }
 
     /// <summary>
-    /// Disables input actions
+    /// Disables and disposes the move and jump input actions.
     /// </summary>
     private void DisableInputActions()
     {
@@ -210,7 +215,7 @@ public class Mario : MonoBehaviour, IDamageSource
     }
 
     /// <summary>
-    /// Reads moveInput and makes Mario react to it.
+    /// Reads input, flips sprite direction, switches walk/idle animation, and handles jumping.
     /// </summary>
     private void HandleInput()
     {
@@ -242,7 +247,7 @@ public class Mario : MonoBehaviour, IDamageSource
     }
 
     /// <summary>
-    /// Creates minX and maxX bounds
+    /// Calculates horizontal movement bounds based on Mario's collider and screen width.
     /// </summary>
     private void CreateBounds()
     {
@@ -252,7 +257,7 @@ public class Mario : MonoBehaviour, IDamageSource
     }
 
     /// <summary>
-    /// Updates the animation
+    /// Advances the current animation frame based on elapsed time and FPS.
     /// </summary>
     private void UpdateAnimation()
     {
@@ -270,9 +275,9 @@ public class Mario : MonoBehaviour, IDamageSource
     }
 
     /// <summary>
-    /// Plays an animation based on a string
+    /// Switches to a named animation, resetting the frame counter.
     /// </summary>
-    /// <param name="animation">Animation to paly</param>
+    /// <param name="animation">Key into the animation dictionary (e.g. "Idle", "Walk", "Jump").</param>
     private void PlayAnimation(string animation)
     {
         if (currentAnimation != null && currentAnimation.Name == animation)
@@ -284,10 +289,10 @@ public class Mario : MonoBehaviour, IDamageSource
     }
 
     /// <summary>
-    /// 
+    /// Returns true only if Mario is hitting the object from above (stomping).
     /// </summary>
-    /// <param name="collision"></param>
-    /// <returns></returns>
+    /// <param name="collision">Contacts are scanned for upward normals to confirm a stomp.</param>
+    /// <returns>True if Mario landed on top of the object; false for side or bottom hits.</returns>
     public bool CanDamage(Collision collision)
     {
         foreach (ContactPoint contact in collision.contacts)
@@ -305,17 +310,17 @@ public class Mario : MonoBehaviour, IDamageSource
 public class MeshAnimation
 {
     /// <summary>
-    /// The animations framerate
+    /// Playback speed in frames per second.
     /// </summary>
     [field: SerializeField] public float FPS { get; set; }
 
     /// <summary>
-    /// The meshes for this animation
+    /// Ordered array of meshes representing each animation frame.
     /// </summary>
     [field: SerializeField] public Mesh[] Meshes { get; set; }
 
     /// <summary>
-    /// The animation's name
+    /// Name used to look up this animation (e.g. "Idle", "Walk", "Jump").
     /// </summary>
     [field: SerializeField] public string Name { get; set; }
 

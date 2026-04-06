@@ -9,6 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8816863779987307760}
+  - component: {fileID: 2382459780204325583}
+  - component: {fileID: 6694750748495407491}
   m_Layer: 0
   m_Name: Mariomode
   m_TagString: Untagged
@@ -35,6 +37,34 @@ Transform:
   - {fileID: 3503243525341401905}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2382459780204325583
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1711430170355118100}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7b54b5709405424993056e539ed9786, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MarioMode
+  <WireFrameBuildUp>k__BackingField: {fileID: 6694750748495407491}
+  <Mario>k__BackingField: {fileID: 5312403535358490064}
+  <PipeEntrance>k__BackingField: {fileID: 4292794628660253244}
+  <QuestionBlock>k__BackingField: {fileID: 4583776077595265673}
+--- !u!114 &6694750748495407491
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1711430170355118100}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a569339ee2a753499b7df6a5b58024a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WireframeBuildUp
 --- !u!1 &3585492940983800041
 GameObject:
   m_ObjectHideFlags: 0
@@ -287,6 +317,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f51234d1d7c8562419fbd993a34a6951, type: 3}
+--- !u!114 &4583776077595265673 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4056941078248444189, guid: f51234d1d7c8562419fbd993a34a6951, type: 3}
+  m_PrefabInstance: {fileID: 563511133870201748}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d495fa0db0db49c4a8d701aa24e4e3af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::QuestionBlock
 --- !u!4 &8497935601040886962 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8232374526155921190, guid: f51234d1d7c8562419fbd993a34a6951, type: 3}
@@ -890,6 +931,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c4cd1ebdc284d724884ee677a34aa5f0, type: 3}
+--- !u!114 &5312403535358490064 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8247819366101446760, guid: c4cd1ebdc284d724884ee677a34aa5f0, type: 3}
+  m_PrefabInstance: {fileID: 4309758878767252920}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2692b6fc95de0894ab75c4396c7aa20c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Mario
 --- !u!4 &8667857959021684753 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4865361209689746857, guid: c4cd1ebdc284d724884ee677a34aa5f0, type: 3}

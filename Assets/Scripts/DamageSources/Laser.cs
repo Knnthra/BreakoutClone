@@ -3,27 +3,26 @@ using UnityEngine;
 public class Laser : MonoBehaviour
 {
     /// <summary>
-    /// The laser's speed
+    /// Upward movement speed in units per second.
     /// </summary>
     [SerializeField] private float speed;
 
     /// <summary>
-    /// A reference to the lasers renderer.
+    /// Renderer used to calculate collision half-extents from bounds.
     /// </summary>
-    [SerializeField] private Renderer renderer;
+    [SerializeField] private Renderer laserRenderer;
 
     /// <summary>
-    /// Half extend used for collision detection
+    /// Half-extents of the laser's bounds, used for boxcast collision detection.
     /// </summary>
     private Vector3 halfExtents;
-
 
     private void Start()
     {
         Destroy(gameObject, 10);
 
-        if (renderer != null)
-            halfExtents = renderer.bounds.extents;
+        if (laserRenderer != null)
+            halfExtents = laserRenderer.bounds.extents;
     }
 
     private void Update()
@@ -36,8 +35,9 @@ public class Laser : MonoBehaviour
     }
 
     /// <summary>
-    /// Collision detection with Boxcast, to make the collisoin more reliable
+    /// Performs a boxcast ahead of the laser to detect and damage bricks or chunks.
     /// </summary>
+    /// <param name="distance">How far ahead to cast the box, matching this frame's movement distance.</param>
     private void CollisionDetection(float distance)
     {
         RaycastHit[] hits = Physics.BoxCastAll(transform.position, halfExtents, Vector3.up, Quaternion.identity, distance);

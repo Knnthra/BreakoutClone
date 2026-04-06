@@ -5,23 +5,69 @@ using UnityEngine.InputSystem;
 
 public class Paddle : MonoBehaviour
 {
+    /// <summary>
+    /// Movement speed of the paddle in units per second.
+    /// </summary>
     [field: SerializeField] public float Speed { get; set; } = 15f;
+
+    /// <summary>
+    /// The paddle's collider, used for ball bounce detection.
+    /// </summary>
     [field: SerializeField] public Collider Collider { get; private set; }
 
-    // Negative value lets the paddle overlap the invisible wall, preventing perspective gaps
-
+    /// <summary>
+    /// Horizontal padding from the screen edge. Negative allows wall overlap.
+    /// </summary>
     [SerializeField] private float paddingFromEdge = -0.5f;
+
+    /// <summary>
+    /// Maximum tilt angle in degrees when the paddle is moving.
+    /// </summary>
     [SerializeField] private float moveTiltAngle = 10f;
+
+    /// <summary>
+    /// How quickly the tilt lerps toward the target angle.
+    /// </summary>
     [SerializeField] private float tiltSmoothing = 8f;
+
+    /// <summary>
+    /// Child transform that receives the tilt animation.
+    /// </summary>
     [SerializeField] private Transform visual;
 
+    /// <summary>
+    /// Invoked when the ball hits the paddle.
+    /// </summary>
     public Action BallHit;
 
+    /// <summary>
+    /// Rigidbody used for kinematic movement.
+    /// </summary>
     private Rigidbody rb;
+
+    /// <summary>
+    /// Input action for horizontal paddle movement.
+    /// </summary>
     private InputAction moveAction;
+
+    /// <summary>
+    /// Left horizontal bound.
+    /// </summary>
     private float minX;
+
+    /// <summary>
+    /// Right horizontal bound.
+    /// </summary>
     private float maxX;
+
+    /// <summary>
+    /// Current frame's horizontal input value (-1 to 1).
+    /// </summary>
     private float moveInput;
+
+    /// <summary>
+    /// Current smoothed tilt angle.
+    /// </summary>
     private float currentTilt;
 
     private void Awake()
@@ -58,7 +104,22 @@ public class Paddle : MonoBehaviour
 
         moveInput = moveAction.ReadValue<float>();
 
-        // Smoothly tilt the visual child toward the move direction, eases back to 0 when idle
+        TiltPaddle();
+
+    }
+
+    private void FixedUpdate()
+    {
+        if (GameManager.Instance.IsGameOver) return;
+
+        Move();
+    }
+
+    /// <summary>
+    /// Tilt the paddle towards the moving direction
+    /// </summary>
+    private void TiltPaddle()
+    {
         if (visual != null)
         {
             float targetTilt = -moveInput * moveTiltAngle;
@@ -67,16 +128,20 @@ public class Paddle : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
+    /// <summary>
+    /// Moves the paddle based on moveinput
+    /// </summary>
+    private void Move()
     {
-        if (GameManager.Instance.IsGameOver) return;
-
         Vector3 pos = rb.position;
         pos.x += moveInput * Speed * Time.fixedDeltaTime;
         pos.x = Mathf.Clamp(pos.x, minX, maxX);
         rb.MovePosition(pos);
     }
 
+    /// <summary>
+    /// Invokes the BallHit callback. Called by the ball on paddle collision.
+    /// </summary>
     public void OnBallHit()
     {
         BallHit?.Invoke();

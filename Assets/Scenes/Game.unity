@@ -196,6 +196,7 @@ Transform:
   - {fileID: 1509671798}
   - {fileID: 469509296}
   - {fileID: 291533055}
+  - {fileID: 1637562125}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &264413339
@@ -1198,6 +1199,7 @@ MonoBehaviour:
   - {fileID: 1448157435}
   - {fileID: 338748599}
   spinSpeed: 720
+  ballObject: {fileID: 1791009641}
 --- !u!1 &490922754
 GameObject:
   m_ObjectHideFlags: 0
@@ -2048,9 +2050,6 @@ PrefabInstance:
       addedObject: {fileID: 2130504105}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 52f9f0c8ac92d0e45858345edb985d45, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2130504113}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 52f9f0c8ac92d0e45858345edb985d45, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 2130504109}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 52f9f0c8ac92d0e45858345edb985d45, type: 3}
       insertIndex: -1
@@ -2104,7 +2103,7 @@ MonoBehaviour:
   brickPrefab: {fileID: 2211047259597784264, guid: b9c94077a6cae4241b4424deccaab88b, type: 3}
   powerUpPrefab: {fileID: 3077464259528212152, guid: 4fd20b314a6efc840800632505786868, type: 3}
   spacingRatio: 0.05
-  levelHeightRatio: 0.5
+  levelHeightRatio: 0.47
   brickAspectRatio: 3
   scaleFactor: 0.8
   topOffset: 1
@@ -2771,7 +2770,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LifeManager
   parent: {fileID: 1869894490}
   prefab: {fileID: 822935544672155385, guid: 4204154d4984a114db34897e768c3afc, type: 3}
-  lifes: 3
+  lives: 3
 --- !u!1 &1609971884
 GameObject:
   m_ObjectHideFlags: 0
@@ -2807,6 +2806,52 @@ Transform:
   - {fileID: 270635401}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1637562124
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1637562125}
+  - component: {fileID: 1637562126}
+  m_Layer: 0
+  m_Name: PowerUpEffectHandler
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1637562125
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1637562124}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 200836799}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1637562126
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1637562124}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58b1422fe948f1a46bc9becf75b4a889, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PowerUpEffectHandler
+  <VisualTransform>k__BackingField: {fileID: 1239029053}
+  <Paddle>k__BackingField: {fileID: 2130504105}
 --- !u!1001 &1645017923
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3613,19 +3658,6 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 3256123080762291287, guid: 52f9f0c8ac92d0e45858345edb985d45, type: 3}
---- !u!114 &2130504113
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2130504104}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 58b1422fe948f1a46bc9becf75b4a889, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PowerUpEffectHandler
-  <VisualTransform>k__BackingField: {fileID: 1239029053}
 --- !u!1001 &5871922923515148085
 PrefabInstance:
   m_ObjectHideFlags: 0

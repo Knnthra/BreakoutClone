@@ -4,19 +4,19 @@ using UnityEngine;
 public class BrickPowerUp : Brick
 {
     /// <summary>
-    /// The PowerUp this Brick will spawn when destroyed
+    /// Power-up prefab spawned the first time this brick is destroyed.
     /// </summary>
     [SerializeField]private GameObject powerUpPrefab;
 
     /// <summary>
-    /// Indicates if the powerup has spawned or not
+    /// Prevents the power-up from being spawned more than once.
     /// </summary>
     private bool spawned = false;
 
     /// <summary>
-    /// Spawns the powerup the first time the brick gets hit
+    /// Spawns a power-up on first destruction, then delegates to the base class.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>True if health reached zero and the brick was destroyed.</returns>
     public override bool TryDestroy()
     {
         if (!spawned)

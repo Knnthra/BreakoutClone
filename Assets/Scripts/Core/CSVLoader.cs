@@ -3,18 +3,64 @@ using UnityEngine;
 
 public class CSVLoader : MonoBehaviour, ILevelLoader
 {
+    /// <summary>
+    /// CSV text file containing the level layout.
+    /// </summary>
     [SerializeField] private TextAsset level;
+
+    /// <summary>
+    /// Prefab used for regular bricks.
+    /// </summary>
     [SerializeField] private Brick brickPrefab;
+
+    /// <summary>
+    /// Prefab used for bricks that drop a power-up.
+    /// </summary>
     [SerializeField] private Brick powerUpPrefab;
+
+    /// <summary>
+    /// Fraction of cell size used as spacing between bricks.
+    /// </summary>
     [SerializeField][Range(0f, 0.5f)] private float spacingRatio = 0.05f;
+
+    /// <summary>
+    /// Fraction of the screen height used for the brick grid.
+    /// </summary>
     [SerializeField][Range(0f, 1f)] private float levelHeightRatio = 0.5f;
+
+    /// <summary>
+    /// Width-to-height ratio of each brick.
+    /// </summary>
     [SerializeField] private float brickAspectRatio = 3f;
+
+    /// <summary>
+    /// Multiplier applied to the overall brick grid size.
+    /// </summary>
     [SerializeField][Range(0.1f, 2f)] private float scaleFactor = 1f;
+
+    /// <summary>
+    /// Vertical offset from the top of the screen to the first row.
+    /// </summary>
     [SerializeField] private float topOffset = 1f;
+
+    /// <summary>
+    /// Depth thickness of each brick in world units.
+    /// </summary>
     [SerializeField] private float brickDepth = 0.3f;
+
+    /// <summary>
+    /// Mesh variants assigned to bricks based on their health.
+    /// </summary>
     [SerializeField] private MeshFilter[] meshes;
+
+    /// <summary>
+    /// Colors assigned to bricks based on their health level.
+    /// </summary>
     [SerializeField] private Color[] brickColors;
 
+    /// <summary>
+    /// Parsed 2D grid of cell values from the CSV file.
+    /// </summary>
     private string[][] grid;
 
     private void Start()
@@ -22,6 +68,9 @@ public class CSVLoader : MonoBehaviour, ILevelLoader
         LoadLevel();
     }
 
+    /// <summary>
+    /// Parses the CSV text asset into a 2D string grid.
+    /// </summary>
     public void ReadFile()
     {
         string[] rows = level.text.Trim().Split('\n');
@@ -34,6 +83,9 @@ public class CSVLoader : MonoBehaviour, ILevelLoader
         }
     }
 
+    /// <summary>
+    /// Reads the level file and instantiates bricks in a grid fitted to the camera view.
+    /// </summary>
     public void LoadLevel()
     {
         ReadFile();
@@ -79,7 +131,7 @@ public class CSVLoader : MonoBehaviour, ILevelLoader
         {
             for (int col = 0; col < grid[row].Length; col++)
             {
-                
+
                 string cell = grid[row][col];
                 if (string.IsNullOrEmpty(cell))
                     continue;
@@ -88,14 +140,12 @@ public class CSVLoader : MonoBehaviour, ILevelLoader
                 float y = startY - row * cellHeight - cellHeight / 2f;
 
                 Brick prefab = cell.Contains('x') ? powerUpPrefab : brickPrefab;
-                        
+
                 // After -90° Y rotation: local X -> world Z (depth), local Z -> world X (width)
                 Brick brick = Instantiate(prefab, new Vector3(x, y, camPos.z + 10f), Quaternion.Euler(0f, -90f, 0f));
-                int health = 1;
-
-                
-                
-                int.TryParse(cell.Replace("x", ""), out health);
+                if (!int.TryParse(cell.Replace("x", ""), out int health))
+                    health = 1;
+                health = Mathf.Clamp(health, 1, brickColors.Length);
                 brick.Health = health;
                 brick.BrickColor = brickColors[health - 1];
                 brick.GetComponent<MeshRenderer>().material.SetColor("_BaseColor", brickColors[health - 1]);

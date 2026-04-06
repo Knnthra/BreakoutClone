@@ -6,38 +6,87 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    /// <summary>
+    /// Singleton instance accessible from anywhere.
+    /// </summary>
     public static GameManager Instance { get; private set; }
+
+    /// <summary>
+    /// GameObject shown when the player loses all lives.
+    /// </summary>
     [SerializeField] private GameObject gameOverText;
+
+    /// <summary>
+    /// GameObject shown when all bricks are cleared.
+    /// </summary>
     [SerializeField] private GameObject youWinText;
+
+    /// <summary>
+    /// Post-processing volume used for the grayscale effect on game end.
+    /// </summary>
     [SerializeField] private Volume globalVolume;
 
+    /// <summary>
+    /// Meshes for digits 0-9 used by the score display.
+    /// </summary>
     [SerializeField] private Mesh[] numberMeshes;
+
+    /// <summary>
+    /// MeshFilters for each digit slot in the score display.
+    /// </summary>
     [SerializeField] private MeshFilter[] numberMeshFilters;
+
+    /// <summary>
+    /// Rotation speed in degrees per second for the score spin animation.
+    /// </summary>
     [SerializeField] private float spinSpeed = 720f;
 
+    /// <summary>
+    /// A reference to the ball object
+    /// </summary>
+    [SerializeField]private Ball ballObject;
+
+    /// <summary>
+    /// True once the game has ended, either by winning or losing.
+    /// </summary>
     public bool IsGameOver { get; private set; }
 
+    /// <summary>
+    /// Current player score.
+    /// </summary>
     private int score = 0;
+
+    /// <summary>
+    /// Digit values from the previous frame, used to detect changes for spin animation.
+    /// </summary>
     private int[] previousDigits;
+
+    /// <summary>
+    /// Accumulated spin angle per digit slot.
+    /// </summary>
     private float[] spinAngles;
+
+    /// <summary>
+    /// Original rotations of each digit slot, restored after spin completes.
+    /// </summary>
     private Quaternion[] originalRotations;
+
+    /// <summary>
+    /// True while any digit is still spinning.
+    /// </summary>
     private bool isSpinning;
+
+    /// <summary>
+    /// Number of bricks still alive. Triggers win when it reaches zero.
+    /// </summary>
     private int activeBrickCount;
+
 
 
     private void Awake()
     {
-          Instance = this;
-          int length = numberMeshFilters.Length;
-          spinAngles = new float[length];
-          previousDigits = new int[length];
-          originalRotations = new Quaternion[length];
-
-          for (int i = 0; i < length; i++)
-          {
-              originalRotations[i] = numberMeshFilters[i].transform.localRotation;
-              spinAngles[i] = 360f;
-          }
+        Instance = this;
+        InitializeScoreDisplay();
     }
 
     private void Start()
@@ -48,18 +97,44 @@ public class GameManager : MonoBehaviour
         AudioManager.Instance.PlayIngameMusic();
     }
 
+    /// <summary>
+    /// Initializes the score display so that we can make a spin effect when scoring points
+    /// </summary>
+    private void InitializeScoreDisplay()
+    {
+        int length = numberMeshFilters.Length;
+        spinAngles = new float[length];
+        previousDigits = new int[length];
+        originalRotations = new Quaternion[length];
+
+        for (int i = 0; i < length; i++)
+        {
+            originalRotations[i] = numberMeshFilters[i].transform.localRotation;
+            spinAngles[i] = 360f;
+        }
+    }
+
+    /// <summary>
+    /// Activates the game-over text and ends the game.
+    /// </summary>
     private void GameOver()
     {
         gameOverText.SetActive(true);
         EndGame();
     }
 
+    /// <summary>
+    /// Activates the you-win text and ends the game.
+    /// </summary>
     private void Win()
     {
         youWinText.SetActive(true);
         EndGame();
     }
 
+    /// <summary>
+    /// Shared end-game logic: flags game over, applies grayscale, and loads the menu.
+    /// </summary>
     private void EndGame()
     {
         IsGameOver = true;
@@ -70,6 +145,10 @@ public class GameManager : MonoBehaviour
         StartCoroutine(LoadMenu());
     }
 
+    /// <summary>
+    /// Waits a few seconds then loads the main menu scene.
+    /// </summary>
+    /// <returns>Coroutine that waits then transitions to the menu scene.</returns>
     private IEnumerator LoadMenu()
     {
         yield return new WaitForSeconds(5);
@@ -77,6 +156,14 @@ public class GameManager : MonoBehaviour
     }
 
     private void Update()
+    {
+        SpinNumber();
+    }
+
+    /// <summary>
+    /// Makes the score number spin when the score updates
+    /// </summary>
+    private void SpinNumber()
     {
         if (!isSpinning) return;
 
@@ -101,8 +188,14 @@ public class GameManager : MonoBehaviour
             isSpinning = false;
     }
 
+    /// <summary>
+    /// Increments the active brick counter. Called by each brick on Start.
+    /// </summary>
     public void RegisterBrick() => activeBrickCount++;
 
+    /// <summary>
+    /// Decrements the active brick counter and triggers a win if all bricks are cleared.
+    /// </summary>
     public void RemoveBrick()
     {
         activeBrickCount--;
@@ -111,12 +204,18 @@ public class GameManager : MonoBehaviour
             Win();
     }
 
+    /// <summary>
+    /// Adds one point to the score and refreshes the mesh-based score display.
+    /// </summary>
     public void ScorePoint()
     {
         score++;
         UpdateScoreDisplay();
     }
 
+    /// <summary>
+    /// Updates each digit slot mesh and triggers a spin animation for changed digits.
+    /// </summary>
     private void UpdateScoreDisplay()
     {
         for (int i = 0; i < numberMeshFilters.Length; i++)
@@ -132,5 +231,27 @@ public class GameManager : MonoBehaviour
 
             previousDigits[i] = digit;
         }
+    }
+
+    /// <summary>
+    /// Enables and resets the the ball
+    /// </summary>
+    public void EnableAndResetBall()
+    {
+        if (ballObject != null)
+        {
+            ballObject.gameObject.SetActive(true);
+            ballObject.ResetBall();
+        }
+    }
+
+    /// <summary>
+    /// Disables the ball
+    /// </summary>
+    public void DisableBall()
+    {
+        // Find and deactivate the ball
+        if (ballObject != null)
+            ballObject.gameObject.SetActive(false);
     }
 }
