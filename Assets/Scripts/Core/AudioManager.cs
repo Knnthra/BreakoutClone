@@ -76,4 +76,15 @@ public class AudioManager : MonoBehaviour
     {
         sfxSource.PlayOneShot(clip);
     }
+
+    /// <summary>
+    /// Toggles mute on both music and SFX sources. Returns true if now muted.
+    /// </summary>
+    public bool ToggleMute()
+    {
+        bool muted = !musicSource.mute;
+        musicSource.mute = muted;
+        sfxSource.mute = muted;
+        return muted;
+    }
 }

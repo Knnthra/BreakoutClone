@@ -71,7 +71,7 @@ MonoBehaviour:
   m_Active: 1
   settings:
     pixelSize: 4
-    enableColorQuantization: 1
+    enableColorQuantization: 0
     colorLevels: 10
     enableOutlines: 0
     outlineThreshold: 0.05
@@ -79,6 +79,7 @@ MonoBehaviour:
     enableDithering: 0
     ditherStrength: 0.15
     renderPassEvent: 600
+  pixelArtShader: {fileID: 4800000, guid: 9d8feab885c2cf34e868b3575dc6da38, type: 3}
 --- !u!114 &7833122117494664109
 MonoBehaviour:
   m_ObjectHideFlags: 0

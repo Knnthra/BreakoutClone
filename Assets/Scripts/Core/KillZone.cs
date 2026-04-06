@@ -6,6 +6,7 @@ public class KillZone : MonoBehaviour
     /// Reference to the ball, used to reset it after losing a life.
     /// </summary>
     [SerializeField] private Ball ball;
+    [SerializeField] private AudioClip deathSound;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -14,6 +15,7 @@ public class KillZone : MonoBehaviour
             if (GameManager.Instance.IsGameOver)
                 return;
 
+            if (deathSound != null) AudioManager.Instance.PlaySFX(deathSound);
             LifeManager.Instance.RemoveLife();
 
             if (!GameManager.Instance.IsGameOver)

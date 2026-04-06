@@ -46,6 +46,23 @@ public class GameManager : MonoBehaviour
     /// </summary>
     [SerializeField]private Ball ballObject;
 
+    [Header("Intro Camera")]
+
+    /// <summary>
+    /// The camera that flies in at the start of the game.
+    /// </summary>
+    [SerializeField] private Camera introCamera;
+
+    /// <summary>
+    /// World position the camera starts at before flying to (0,0,0).
+    /// </summary>
+    [SerializeField] private Vector3 introStartPosition;
+
+    /// <summary>
+    /// How long the fly-in takes in seconds.
+    /// </summary>
+    [SerializeField] private float introDuration = 2f;
+
     /// <summary>
     /// True once the game has ended, either by winning or losing.
     /// </summary>
@@ -95,6 +112,39 @@ public class GameManager : MonoBehaviour
         youWinText.SetActive(false);
         LifeManager.Instance.OnGameOver += GameOver;
         AudioManager.Instance.PlayIngameMusic();
+
+        if (introCamera != null)
+            StartCoroutine(IntroCameraFlyIn());
+    }
+
+    /// <summary>
+    /// Flies a separate intro camera from introStartPosition to the main camera's position,
+    /// then disables it so the main camera takes over. The main camera never moves,
+    /// so brick spawning and other systems that depend on it are unaffected.
+    /// </summary>
+    private IEnumerator IntroCameraFlyIn()
+    {
+        DisableBall();
+
+        Camera mainCam = Camera.main;
+        Vector3 targetPosition = mainCam.transform.position;
+        Quaternion targetRotation = mainCam.transform.rotation;
+
+        introCamera.transform.position = introStartPosition;
+        introCamera.transform.rotation = targetRotation;
+        introCamera.gameObject.SetActive(true);
+
+        float elapsed = 0f;
+        while (elapsed < introDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.SmoothStep(0f, 1f, elapsed / introDuration);
+            introCamera.transform.position = Vector3.Lerp(introStartPosition, targetPosition, t);
+            yield return null;
+        }
+
+        introCamera.gameObject.SetActive(false);
+        EnableAndResetBall();
     }
 
     /// <summary>

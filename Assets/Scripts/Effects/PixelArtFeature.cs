@@ -81,19 +81,23 @@ public class PixelArtFeature : ScriptableRendererFeature
     /// </summary>
     [SerializeField] private PixelArtSettings settings = new PixelArtSettings();
 
+    /// <summary>
+    /// Direct reference to the PixelArt shader. Ensures it is included in builds.
+    /// </summary>
+    [SerializeField] private Shader pixelArtShader;
+
     private Material pixelArtMaterial;
     private PixelArtPass pixelArtPass;
 
     public override void Create()
     {
-        Shader shader = Shader.Find("Hidden/PixelArt");
-        if (shader == null)
+        if (pixelArtShader == null)
         {
-            Debug.LogWarning("PixelArtFeature: Could not find Hidden/PixelArt shader.");
+            Debug.LogWarning("PixelArtFeature: No shader assigned.");
             return;
         }
 
-        pixelArtMaterial = CoreUtils.CreateEngineMaterial(shader);
+        pixelArtMaterial = CoreUtils.CreateEngineMaterial(pixelArtShader);
         pixelArtPass = new PixelArtPass(pixelArtMaterial, settings);
     }
 

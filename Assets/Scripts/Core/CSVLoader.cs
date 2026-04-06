@@ -1,12 +1,13 @@
+using System.IO;
 using System.Linq;
 using UnityEngine;
 
 public class CSVLoader : MonoBehaviour, ILevelLoader
 {
     /// <summary>
-    /// CSV text file containing the level layout.
+    /// Filename of the CSV level file inside StreamingAssets (e.g. "level.csv").
     /// </summary>
-    [SerializeField] private TextAsset level;
+    [SerializeField] private string levelFileName = "level.csv";
 
     /// <summary>
     /// Prefab used for regular bricks.
@@ -69,11 +70,13 @@ public class CSVLoader : MonoBehaviour, ILevelLoader
     }
 
     /// <summary>
-    /// Parses the CSV text asset into a 2D string grid.
+    /// Reads the CSV file from StreamingAssets and parses it into a 2D string grid.
     /// </summary>
     public void ReadFile()
     {
-        string[] rows = level.text.Trim().Split('\n');
+        string path = Path.Combine(Application.streamingAssetsPath, levelFileName);
+        string text = File.ReadAllText(path);
+        string[] rows = text.Trim().Split('\n');
 
         grid = new string[rows.Length][];
 
