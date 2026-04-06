@@ -3638,6 +3638,7 @@ MonoBehaviour:
   moveTiltAngle: 10
   tiltSmoothing: 8
   visual: {fileID: 1239029053}
+  ball: {fileID: 1791009641}
 --- !u!4 &2130504108 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 52f9f0c8ac92d0e45858345edb985d45, type: 3}

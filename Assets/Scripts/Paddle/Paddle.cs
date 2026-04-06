@@ -36,6 +36,11 @@ public class Paddle : MonoBehaviour
     [SerializeField] private Transform visual;
 
     /// <summary>
+    /// Reference to the ball. Paddle movement is blocked while the ball is inactive.
+    /// </summary>
+    [SerializeField] private Ball ball;
+
+    /// <summary>
     /// Invoked when the ball hits the paddle.
     /// </summary>
     public Action BallHit;
@@ -101,16 +106,17 @@ public class Paddle : MonoBehaviour
     private void Update()
     {
         if (GameManager.Instance.IsGameOver) return;
+        if (ball != null && !ball.gameObject.activeInHierarchy) return;
 
         moveInput = moveAction.ReadValue<float>();
 
         TiltPaddle();
-
     }
 
     private void FixedUpdate()
     {
         if (GameManager.Instance.IsGameOver) return;
+        if (ball != null && !ball.gameObject.activeInHierarchy) return;
 
         Move();
     }
