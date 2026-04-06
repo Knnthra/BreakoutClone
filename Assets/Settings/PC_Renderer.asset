@@ -26,8 +26,7 @@ MonoBehaviour:
     probeVolumeBlendStatesCS: {fileID: 7200000, guid: b9a23f869c4fd45f19c5ada54dd82176, type: 3}
   m_RendererFeatures:
   - {fileID: 7833122117494664109}
-  - {fileID: 6692218158611905251}
-  m_RendererFeatureMap: ad6b866f10d7b46ce33a7b57f588df5c
+  m_RendererFeatureMap: ad6b866f10d7b46c
   m_UseNativeRenderPass: 1
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
@@ -56,30 +55,6 @@ MonoBehaviour:
   m_DepthTextureFormat: 0
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 0
---- !u!114 &6692218158611905251
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a5db11cff36431d47abd9acb2bca661f, type: 3}
-  m_Name: PixelArtFeature
-  m_EditorClassIdentifier: Assembly-CSharp::PixelArtFeature
-  m_Active: 1
-  settings:
-    pixelSize: 4
-    enableColorQuantization: 0
-    colorLevels: 10
-    enableOutlines: 0
-    outlineThreshold: 0.05
-    outlineColor: {r: 0.05, g: 0.05, b: 0.05, a: 1}
-    enableDithering: 0
-    ditherStrength: 0.15
-    renderPassEvent: 600
-  pixelArtShader: {fileID: 4800000, guid: 9d8feab885c2cf34e868b3575dc6da38, type: 3}
 --- !u!114 &7833122117494664109
 MonoBehaviour:
   m_ObjectHideFlags: 0
